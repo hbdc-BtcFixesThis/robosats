@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -16,6 +16,7 @@ import {
 import {
   DataGrid,
   GridPagination,
+  GridSortModel,
   type GridPaginationModel,
   type GridColDef,
   type GridValidRowModel,
@@ -779,6 +780,30 @@ const BookTable = ({
         })
       : orders;
   }, [showControls, orders, fav, paymentMethods]);
+
+  const [sortModel, setSortModel] = useState({
+      field: 'premium',
+      sort: undefined,
+    },
+  ]);
+  const previousFavTypeValue = useRef(fav.type);
+  useMemo(() => {
+    console.log("----------useMemo Triggered------------");
+    console.log(fav.type);
+    console.log(previousFavTypeValue.current);
+    console.log(setSortModel)
+    console.log(sortModel)
+    if (fav.type !== previousFavTypeValue.current){
+      if (fav.type === 1) {
+        // buyer - sort ascending to show best deals first (lowest premium)
+        setSortModel([{ field: 'premium', sort: 'asc'}]);
+      } else if (fav.type === 0) {
+        // seller - sort descending to show best deals first (highest premium)
+        setSortModel([{ field: 'premium', sort: 'desc'}]);
+      }
+      previousFavTypeValue.current = fav.type;
+    }
+  });
 
   if (!fullscreen) {
     return (
